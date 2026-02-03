@@ -3,7 +3,6 @@ services:
   - type: web
     name: eshoponweb
     runtime: docker
-    dockerfilePath: src/Web/Dockerfile
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
