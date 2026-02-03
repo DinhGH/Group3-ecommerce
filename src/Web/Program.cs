@@ -130,17 +130,26 @@ using (var scope = app.Services.CreateScope())
     var scopedProvider = scope.ServiceProvider;
     try
     {
+        app.Logger.LogInformation("Getting CatalogContext...");
         var catalogContext = scopedProvider.GetRequiredService<CatalogContext>();
+        
+        app.Logger.LogInformation("Connection String: {0}", catalogContext.Database.GetConnectionString());
+        app.Logger.LogInformation("Is SQLite: {0}", catalogContext.Database.IsSqlite());
+        
         await CatalogContextSeed.SeedAsync(catalogContext, app.Logger);
 
+        app.Logger.LogInformation("Getting Identity services...");
         var userManager = scopedProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = scopedProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var identityContext = scopedProvider.GetRequiredService<AppIdentityDbContext>();
         await AppIdentityDbContextSeed.SeedAsync(identityContext, userManager, roleManager);
+        
+        app.Logger.LogInformation("Database seeding completed successfully!");
     }
     catch (Exception ex)
     {
-        app.Logger.LogError(ex, "An error occurred seeding the DB.");
+        app.Logger.LogError(ex, "An error occurred seeding the DB. Details: {Message}", ex.Message);
+        app.Logger.LogError("Stack trace: {StackTrace}", ex.StackTrace);
     }
 }
 
