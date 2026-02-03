@@ -9,10 +9,14 @@ public class AppIdentityDbContextSeed
 {
     public static async Task SeedAsync(AppIdentityDbContext identityDbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
     {
-        // Run migrations for both SQL Server and SQLite
-        if (identityDbContext.Database.IsSqlServer() || identityDbContext.Database.IsSqlite())
+        // Run migrations for SQL Server, use EnsureCreated for SQLite
+        if (identityDbContext.Database.IsSqlServer())
         {
             identityDbContext.Database.Migrate();
+        }
+        else if (identityDbContext.Database.IsSqlite())
+        {
+            identityDbContext.Database.EnsureCreated();
         }
 
         await roleManager.CreateAsync(new IdentityRole(BlazorShared.Authorization.Constants.Roles.ADMINISTRATORS));

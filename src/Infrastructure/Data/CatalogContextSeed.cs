@@ -16,10 +16,14 @@ public class CatalogContextSeed
         var retryForAvailability = retry;
         try
         {
-            // Run migrations for both SQL Server and SQLite
-            if (catalogContext.Database.IsSqlServer() || catalogContext.Database.IsSqlite())
+            // Run migrations for SQL Server, use EnsureCreated for SQLite
+            if (catalogContext.Database.IsSqlServer())
             {
                 catalogContext.Database.Migrate();
+            }
+            else if (catalogContext.Database.IsSqlite())
+            {
+                catalogContext.Database.EnsureCreated();
             }
 
             if (!await catalogContext.CatalogBrands.AnyAsync())
