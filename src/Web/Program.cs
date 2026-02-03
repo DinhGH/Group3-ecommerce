@@ -22,14 +22,20 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddConsole();
 
-if (builder.Environment.IsDevelopment() || builder.Environment.EnvironmentName == "Docker"){
-    // Configure SQL Server (local)
+// Check if using Azure Key Vault
+var azureKeyVaultEndpoint = builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"];
+var useAzure = !string.IsNullOrEmpty(azureKeyVaultEndpoint);
+
+if (builder.Environment.IsDevelopment() || builder.Environment.EnvironmentName == "Docker" || !useAzure)
+{
+    // Configure with local connection strings (Development, Docker, or Render)
     Microsoft.eShopWeb.Infrastructure.Dependencies.ConfigureServices(builder.Configuration, builder.Services);
 }
-else{
-    // Configure SQL Server (prod)
+else
+{
+    // Configure SQL Server (Azure production)
     var credential = new ChainedTokenCredential(new AzureDeveloperCliCredential(), new DefaultAzureCredential());
-    builder.Configuration.AddAzureKeyVault(new Uri(builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"] ?? ""), credential);
+    builder.Configuration.AddAzureKeyVault(new Uri(azureKeyVaultEndpoint), credential);
     builder.Services.AddDbContext<CatalogContext>(c =>
     {
         var connectionString = builder.Configuration[builder.Configuration["AZURE_SQL_CATALOG_CONNECTION_STRING_KEY"] ?? ""];
