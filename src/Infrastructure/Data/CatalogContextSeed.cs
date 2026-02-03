@@ -16,16 +16,22 @@ public class CatalogContextSeed
         var retryForAvailability = retry;
         try
         {
+            logger.LogInformation("Starting database initialization...");
+            
             // Run migrations for SQL Server, use EnsureCreated for SQLite
             if (catalogContext.Database.IsSqlServer())
             {
+                logger.LogInformation("Running SQL Server migrations...");
                 catalogContext.Database.Migrate();
             }
             else if (catalogContext.Database.IsSqlite())
             {
-                catalogContext.Database.EnsureCreated();
+                logger.LogInformation("Creating SQLite database with EnsureCreated...");
+                var created = catalogContext.Database.EnsureCreated();
+                logger.LogInformation($"Database created: {created}");
             }
 
+            logger.LogInformation("Checking for existing catalog brands...");
             if (!await catalogContext.CatalogBrands.AnyAsync())
             {
                 await catalogContext.CatalogBrands.AddRangeAsync(
