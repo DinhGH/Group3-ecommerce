@@ -9,8 +9,8 @@ public class AppIdentityDbContextSeed
 {
     public static async Task SeedAsync(AppIdentityDbContext identityDbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
     {
-
-        if (identityDbContext.Database.IsSqlServer())
+        // Run migrations for both SQL Server and SQLite
+        if (identityDbContext.Database.IsSqlServer() || identityDbContext.Database.IsSqlite())
         {
             identityDbContext.Database.Migrate();
         }

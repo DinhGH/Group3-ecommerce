@@ -16,7 +16,8 @@ public class CatalogContextSeed
         var retryForAvailability = retry;
         try
         {
-            if (catalogContext.Database.IsSqlServer())
+            // Run migrations for both SQL Server and SQLite
+            if (catalogContext.Database.IsSqlServer() || catalogContext.Database.IsSqlite())
             {
                 catalogContext.Database.Migrate();
             }
