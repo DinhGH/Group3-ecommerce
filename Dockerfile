@@ -16,12 +16,6 @@ COPY --from=build /app/src/Web/out ./
 # Create data directory for SQLite
 RUN mkdir -p /data && chmod 777 /data
 
-# Set environment variables
-ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:8080
-ENV ConnectionStrings__CatalogConnection="Data Source=/data/catalog.db"
-ENV ConnectionStrings__IdentityConnection="Data Source=/data/identity.db"
-
 EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "Web.dll"]
