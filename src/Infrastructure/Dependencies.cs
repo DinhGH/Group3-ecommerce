@@ -27,14 +27,26 @@ public static class Dependencies
         else
         {
             // use real database
-            // Requires LocalDB which can be installed with SQL Server Express 2016
-            // https://www.microsoft.com/en-us/download/details.aspx?id=54284
-            services.AddDbContext<CatalogContext>(c =>
-                c.UseSqlServer(configuration.GetConnectionString("CatalogConnection")));
-
-            // Add Identity DbContext
-            services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("IdentityConnection")));
+            // Support both SQL Server and SQLite
+            var catalogConnection = configuration.GetConnectionString("CatalogConnection");
+            var identityConnection = configuration.GetConnectionString("IdentityConnection");
+            
+            // Check if using SQLite (for Render.com deployment)
+            if (catalogConnection?.Contains("Data Source=") == true && !catalogConnection.Contains("Server="))
+            {
+                services.AddDbContext<CatalogContext>(c =>
+                    c.UseSqlite(catalogConnection));
+                services.AddDbContext<AppIdentityDbContext>(options =>
+                    options.UseSqlite(identityConnection));
+            }
+            else
+            {
+                // SQL Server (local development)
+                services.AddDbContext<CatalogContext>(c =>
+                    c.UseSqlServer(catalogConnection));
+                services.AddDbContext<AppIdentityDbContext>(options =>
+                    options.UseSqlServer(identityConnection));
+            }
         }
     }
 }

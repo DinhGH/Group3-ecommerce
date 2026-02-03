@@ -21,7 +21,13 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/src/Web/out ./
 
+# Create data directory for SQLite
+RUN mkdir -p /data && chmod 777 /data
+
 # Optional: Set this here if not setting it from docker-compose.yml
-# ENV ASPNETCORE_ENVIRONMENT Development
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://+:8080
+
+EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "Web.dll"]

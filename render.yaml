@@ -1,0 +1,20 @@
+services:
+  # Web Application
+  - type: web
+    name: eshoponweb
+    runtime: docker
+    dockerfilePath: ./src/Web/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ConnectionStrings__CatalogConnection
+        value: Data Source=/data/catalog.db
+      - key: ConnectionStrings__IdentityConnection
+        value: Data Source=/data/identity.db
+    disk:
+      name: eshoponweb-data
+      mountPath: /data
+      sizeGB: 1
