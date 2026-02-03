@@ -196,6 +196,9 @@ else
     app.UseHsts();
 }
 
+// Add database initialization middleware
+app.UseMiddleware<Microsoft.eShopWeb.Web.Middleware.DatabaseInitializationMiddleware>();
+
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
